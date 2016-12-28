@@ -3,6 +3,7 @@ package project.client;
 
 import project.client.config.*;
 
+
 public class Runner {
 
 	public static void main(String[] args) throws Throwable {
@@ -15,9 +16,7 @@ public class Runner {
 		//show the menu and menu choices		
 		OptionChoice choice = new OptionChoice();		
 		choice.MakeChoice();
-		
-		
-		
+				
 		System.out.println(ctx);
 
 	}

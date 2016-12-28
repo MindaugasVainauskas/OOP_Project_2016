@@ -30,11 +30,11 @@ public class XMLParser {
 				Element e = (Element)next;
 				
 				if(e.getNodeName().equals("server-host")){					
-					ctx.setHost(e.getFirstChild().getNodeValue());						
+					ctx.setHost(e.getFirstChild().getNodeValue()); //set the host name to IP address specified in the conf file				
 				}else if(e.getNodeName().equals("server-port")){
 					ctx.setPort(Integer.parseInt(e.getFirstChild().getNodeValue())); // need to remember to parse this string as Integer as value in ctx variable is int
 				}else if(e.getNodeName().equals("download-dir")){
-					ctx.setDirectory(e.getFirstChild().getNodeValue());
+					ctx.setDirectory(e.getFirstChild().getNodeValue()); // set the download directory to the one set in conf file
 				}
 			}//end of if statement to check if node is instance of Element type
 		}//end of for loop that loops over children nodes
