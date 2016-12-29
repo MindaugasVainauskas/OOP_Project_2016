@@ -18,6 +18,14 @@ public class Connection{
 					out.writeObject(message);
 					out.flush();// need to make sure that message has been sent
 					ObjectInputStream in = new ObjectInputStream(s.getInputStream());
+					//check for response from server
+					try {
+						String message = (String)in.readObject();
+						System.out.println(message);
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					
 					//close the connections. Not sure if these are at correct position
 					out.close();

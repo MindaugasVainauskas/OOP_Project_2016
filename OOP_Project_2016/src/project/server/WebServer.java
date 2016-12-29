@@ -8,19 +8,20 @@ import project.client.Connection;
 
 public class WebServer {
 	private ServerSocket ss;
-	private Socket cs;
+	
 	
 	private volatile boolean keepRunning = true; // Boolean variable to serve as loop condition
 	
 	private static final int SERVER_PORT = 7777;// name the port number that server is going to run on.
 	//for above I used server number required in the project description
+	private int counter;
 	
 	public WebServer(){
 		
 		try {
 			ss = new ServerSocket(SERVER_PORT);// start up new socket connection on given port number.
-			cs = null;
 			
+			//start listener thread
 			Thread server = new Thread(new Listener(), "Listener thread ");//listener thread to listen for connections
 			server.setPriority(Thread.MAX_PRIORITY);
 			server.start();
@@ -36,7 +37,7 @@ public class WebServer {
 	
 	private class Listener implements Runnable{
 		public void run(){
-			int counter = 0;
+			counter = 0;
 			
 			while(keepRunning){
 				try {
@@ -67,7 +68,8 @@ public class WebServer {
 				Object command = ins.readObject();
 				System.out.println(command);
 				
-				String message = "Working connection";
+				//server response to client
+				String message = "Well Hello there, client "+counter;//response message to show bidirectional communication between client and server
 				ObjectOutputStream out = new ObjectOutputStream(sock.getOutputStream());
 				out.writeObject(message);
 				out.flush();
