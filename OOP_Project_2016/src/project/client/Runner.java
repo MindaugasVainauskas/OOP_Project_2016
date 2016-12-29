@@ -7,17 +7,17 @@ import project.client.config.*;
 public class Runner {
 
 	public static void main(String[] args) throws Throwable {
-		//set the context and parser
-		Context ctx = new Context();
-		XMLParser cp = new XMLParser(ctx);
-		//check that context values are getting through
-		cp.initialise();
+//		//set the context and parser
+//		Context ctx = new Context();
+//		XMLParser cp = new XMLParser(ctx);
+//		//check that context values are getting through
+//		cp.initialise();
 				
 		//show the menu and menu choices		
-		OptionChoice choice = new OptionChoice();		
-		choice.MakeChoice();
+		WebClient client = new WebClient();		
+		client.MakeChoice();
 				
-		System.out.println(ctx);
+//		System.out.println(ctx);
 
 	}
 

@@ -10,18 +10,20 @@ public class WebServer {
 	private ServerSocket ss;
 	private Socket cs;
 	
-	private volatile boolean keepRunning = true;
-	private int counter;
+	private volatile boolean keepRunning = true; // Boolean variable to serve as loop condition
+	
 	private static final int SERVER_PORT = 7777;// name the port number that server is going to run on.
 	//for above I used server number required in the project description
 	
-	private WebServer(){
-		counter = 0;
+	public WebServer(){
+		
 		try {
 			ss = new ServerSocket(SERVER_PORT);// start up new socket connection on given port number.
 			cs = null;
 			
-			
+			Thread server = new Thread(new Listener(), "Listener thread ");//listener thread to listen for connections
+			server.setPriority(Thread.MAX_PRIORITY);
+			server.start();
 			
 			System.out.println("Server up and running at port "+SERVER_PORT);
 		} catch (IOException e) {
@@ -29,19 +31,27 @@ public class WebServer {
 			e.printStackTrace();
 		}
 		
-		while(keepRunning){
-			try {
-				Thread server = new Thread(new Connection(cs), "Thread "+(counter+1));
-				server.setPriority(Thread.MAX_PRIORITY);
-				server.start();
-				counter++;
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+	
 	}
 	
+	private class Listener implements Runnable{
+		public void run(){
+			int counter = 0;
+			
+			while(keepRunning){
+				try {
+					Socket s = ss.accept();
+					new Thread(new HTTPRequest(s), "Thread "+(counter+1)).start();//listener thread spawns new worker thread to do the job
+					counter++;
+					System.out.println("Connection count at "+counter);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+		}
+	}// End of Listener class
 	
 	
 	private class HTTPRequest implements Runnable{
@@ -56,6 +66,12 @@ public class WebServer {
 				ObjectInputStream ins = new ObjectInputStream(sock.getInputStream());
 				Object command = ins.readObject();
 				System.out.println(command);
+				
+				String message = "Working connection";
+				ObjectOutputStream out = new ObjectOutputStream(sock.getOutputStream());
+				out.writeObject(message);
+				out.flush();
+				out.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
