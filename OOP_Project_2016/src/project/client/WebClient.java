@@ -52,8 +52,7 @@ public class WebClient {
 			//switch to act on user's decision
 			switch(userChoice){
 				case 1:					
-					System.out.println("Making connection to server");
-					System.out.println("Connection details: "+hostName+"; Port: "+hostPort);
+					System.out.println("Making connection to server");					
 					cn.connectToServer(hostName, hostPort);
 					break;
 				case 2:
