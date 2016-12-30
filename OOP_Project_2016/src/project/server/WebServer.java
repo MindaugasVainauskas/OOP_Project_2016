@@ -71,7 +71,7 @@ public class WebServer {
 				System.out.println(command);
 				
 				//server response to client
-				String message = "Well Hello there, client "+counter+"on socket "+sock;//response message to show bidirectional communication between client and server
+				String message = "Client "+counter+", connected on socket "+sock;//response message to show bidirectional communication between client and server
 				ObjectOutputStream out = new ObjectOutputStream(sock.getOutputStream());
 				out.writeObject(message);
 				out.flush();

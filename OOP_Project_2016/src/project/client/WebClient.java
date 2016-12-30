@@ -57,7 +57,7 @@ public class WebClient {
 					cn.connectToServer(hostName, hostPort);
 					break;
 				case 2:
-					System.out.println("Printing file listing");
+					System.out.println("Printing file listing\n");
 					cn.ListFiles();
 					break;
 				case 3:
@@ -66,7 +66,7 @@ public class WebClient {
 					scan.nextLine();//flush the buffer
 					
 					System.out.println("Downloading a file "+fileName);
-					cn.DownloadFile(fileName);
+					cn.DownloadFile(directory, fileName);
 					break;
 				case 4:
 					System.out.println("Application is exiting. Good Bye");
