@@ -13,6 +13,8 @@ public class WebServer {
 	private volatile boolean keepRunning = true; // Boolean variable to serve as loop condition
 	
 	private static final int SERVER_PORT = 7777;// name the port number that server is going to run on.
+	
+	private static final String FILE_DIRECTORY = "/File_Source";
 	//for above I used server number required in the project description
 	private int counter;
 	
@@ -69,7 +71,7 @@ public class WebServer {
 				System.out.println(command);
 				
 				//server response to client
-				String message = "Well Hello there, client "+counter;//response message to show bidirectional communication between client and server
+				String message = "Well Hello there, client "+counter+"on socket "+sock;//response message to show bidirectional communication between client and server
 				ObjectOutputStream out = new ObjectOutputStream(sock.getOutputStream());
 				out.writeObject(message);
 				out.flush();

@@ -1,6 +1,5 @@
 package project.client;
 
-import java.io.IOException;
 import java.net.*;
 import java.io.*;
 
@@ -46,5 +45,14 @@ public class Connection{
 		}).start();
 		
 	}
+
+	//method to list files on server
+	protected void ListFiles(){
+		
+	}
 	
+	//method to download a file
+	public void DownloadFile(String fName){
+		
+	}
 }

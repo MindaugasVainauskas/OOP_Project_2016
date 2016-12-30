@@ -4,7 +4,7 @@ package project.client;
 import project.client.config.*;
 
 
-public class Runner {
+public class ClientRunner {
 
 	public static void main(String[] args) throws Throwable {
 //		//set the context and parser
