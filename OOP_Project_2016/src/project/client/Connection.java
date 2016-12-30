@@ -4,19 +4,23 @@ import java.net.*;
 import java.io.*;
 
 public class Connection{
-	
+	protected Socket s;
+	protected ObjectOutputStream out;
+	protected ObjectInputStream in;
 	//method to connect to server
 	protected void connectToServer(String hName, int hPort){
 		String message = "Hello Server";
 		new Thread(new Runnable(){
 			public void run(){
 				try {
-					Socket s = new Socket(hName, hPort);// set up socket connection with server at given hostname and port
+					s = new Socket(hName, hPort);// set up socket connection with server at given hostname and port
 					System.out.println("Connection details in Connection class: "+hName+"; "+hPort);
-					ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+					out = new ObjectOutputStream(s.getOutputStream());
 					out.writeObject(message);
 					out.flush();// need to make sure that message has been sent
-					ObjectInputStream in = new ObjectInputStream(s.getInputStream());
+					
+					//read response from server
+					in = new ObjectInputStream(s.getInputStream());
 					//check for response from server
 					try {
 						String message = (String)in.readObject();
@@ -26,18 +30,29 @@ public class Connection{
 						e.printStackTrace();
 					}
 					
-					//close the connections. Not sure if these are at correct position
-					out.close();
-					in.close();
-					s.close();
-				
-					
 				} catch (UnknownHostException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+				}
+				//if socket or object streams are still active close them down at the end
+				finally{
+					try {
+						if(s != null){						
+							s.close();						
+						}
+						if(out != null){
+							out.close();
+						}
+						if(in != null){
+							in.close();
+						}
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 				
 			}
@@ -71,6 +86,9 @@ public class Connection{
 	
 	//method to download a file. Method takes in download directory name and file name as parameters.
 	protected void DownloadFile(String directory, String fName){
+		final String  FILE_TO_GET = "./"+directory+"/"+fName; //set the location for file to be downloaded to.
+		
+		
 		
 	}
 }
