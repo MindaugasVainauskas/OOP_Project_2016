@@ -12,7 +12,7 @@ public class WebServer {
 	
 	private static final int SERVER_PORT = 7777;// name the port number that server is going to run on.
 	
-	private static final String FILE_DIRECTORY = "/File_Source";
+	private static final String FILE_SOURCE = "./File_Source/";
 	//for above I used server number required in the project description
 	private int counter;
 	
@@ -88,6 +88,12 @@ public class WebServer {
 					case "listFiles":
 						listFiles();	
 						break;
+					case "downloadFile":
+						//receive subsequent message with file name to download
+						String fileName = (String)ins.readObject();//read in file name from client response
+						System.out.println("file to download: "+fileName);
+						DownloadFile(fileName);//pass file name into method to handle download
+						break;
 					case "endConnection":
 						endConnection();
 						break;
@@ -122,11 +128,10 @@ public class WebServer {
 		public void endConnection() throws IOException {
 			//server response to client
 			message = "Server disconnected. Good bye";
-			//out = new ObjectOutputStream(sock.getOutputStream());
+			
 			out.writeObject(message);
 			out.flush();
-			System.out.println(Thread.activeCount());
-			
+						
 			//change control variable to false to end loop
 			stayConnected = false;
 		}
@@ -151,10 +156,40 @@ public class WebServer {
 					}
 				}
 				System.out.println("\n");
-			}//end of if/else statement
-			//out = new ObjectOutputStream(sock.getOutputStream());
+			}//end of if/else statement			
 			out.writeObject(response);
 			out.flush();
+			
+		}
+		
+		public void DownloadFile(String fileName){
+			String message = "Downloading is about to commence. File selected: "+fileName;
+			String filePath = FILE_SOURCE+fileName;//path to file in file_Source directory
+			try {
+				out.writeObject(message);//send message about start of download
+				out.flush();
+								
+				
+				File fileToSend = new File(filePath);//instantiate file at given location
+				out.writeLong(fileToSend.length());//send size of file first
+				out.flush();
+				
+				byte[] byteArray = new byte[(int)fileToSend.length()];//set up byte array to send file. It is same length as file size in bytes.
+				FileInputStream fins = new FileInputStream(fileToSend);//read in file from folder
+				BufferedInputStream bins = new BufferedInputStream(fins);//store file in temporary storage
+				bins.read(byteArray, 0, byteArray.length);//read file into temporary storage
+				
+				out.write(byteArray, 0, byteArray.length);//send file in output stream
+				out.flush();
+				bins.close();				
+				System.out.println("Transfer completed!");
+				out.writeInt(-1);
+				out.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			
 		}
 		

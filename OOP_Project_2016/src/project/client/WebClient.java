@@ -45,6 +45,7 @@ public class WebClient {
 		cn = new Connection();
 		cn.sethName(hostName);
 		cn.sethPort(hostPort);
+		cn.setDirectory(directory);//set directory name for downloaded files to be kept
 		
 		//while loop to show menu to user		
 		do{
@@ -66,9 +67,8 @@ public class WebClient {
 				case 3:
 					System.out.println("Please enter full file name with extension to download");
 					fileName = scan.next(); // Get full file name 
-					scan.nextLine();//flush the buffer
-					
-					System.out.println("Downloading a file "+fileName);
+					scan.nextLine();//flush the buffer		
+					cn.setFileName(fileName);//set the file name in connection class to chosen file name
 					cn.execute(3);
 					//cn.DownloadFile(directory, fileName);
 					break;
