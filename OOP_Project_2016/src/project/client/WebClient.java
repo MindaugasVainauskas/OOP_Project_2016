@@ -42,22 +42,26 @@ public class WebClient {
 		configClient();//works. variables are getting the values from xml parser without issues. 
 		//works so test can proceed further
 		//System.out.println(ctx);
-		
+		cn = new Connection();
+		cn.sethName(hostName);
+		cn.sethPort(hostPort);
 		
 		//while loop to show menu to user		
 		do{
 			menu.showMenuOptions();  //show the menu options to user
 			userChoice = scan.nextInt();  //choice read
-			cn = new Connection();
+			
 			//switch to act on user's decision
 			switch(userChoice){
 				case 1:					
-					System.out.println("Making connection to server");					
-					cn.connectToServer(hostName, hostPort);
+					System.out.println("Making connection to server");						
+					cn.execute(1);
+					//cn.connectToServer(hostName, hostPort);
 					break;
 				case 2:
 					System.out.println("Printing file listing\n");
-					cn.ListFiles();
+					cn.execute(2);
+					//cn.ListFiles();
 					break;
 				case 3:
 					System.out.println("Please enter full file name with extension to download");
@@ -65,10 +69,13 @@ public class WebClient {
 					scan.nextLine();//flush the buffer
 					
 					System.out.println("Downloading a file "+fileName);
-					cn.DownloadFile(directory, fileName);
+					cn.execute(3);
+					//cn.DownloadFile(directory, fileName);
 					break;
 				case 4:
-					System.out.println("Application is exiting. Good Bye");
+					System.out.println("Client side application is exiting.");
+					cn.execute(4);
+					//cn.endConnection();
 					keepRunning = false;					
 					break;			
 			}

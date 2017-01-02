@@ -4,8 +4,6 @@ package project.server;
 import java.io.*;
 import java.net.*;
 
-import project.client.Connection;
-
 public class WebServer {
 	private ServerSocket ss;
 	
@@ -44,7 +42,7 @@ public class WebServer {
 			while(keepRunning){
 				try {
 					Socket s = ss.accept();
-					new Thread(new HTTPRequest(s), "Thread "+(counter+1)).start();//listener thread spawns new worker thread to do the job
+					new Thread(new Request(s), "Thread "+(counter+1)).start();//listener thread spawns new worker thread to do the job
 					counter++;
 					System.out.println("Connection count at "+counter);
 				} catch (IOException e) {
@@ -57,25 +55,50 @@ public class WebServer {
 	}// End of Listener class
 	
 	
-	private class HTTPRequest implements Runnable{
+	private class Request implements Runnable{
 		private Socket sock;
+		private volatile boolean stayConnected = true;
+		private String message;
 		
-		private HTTPRequest(Socket request){
+		private ObjectOutputStream out;
+		private ObjectInputStream ins;
+		
+		private Request(Socket request){
 			this.sock = request;
 		}
 		
 		public void run(){
 			try {
-				ObjectInputStream ins = new ObjectInputStream(sock.getInputStream());
+				ins = new ObjectInputStream(sock.getInputStream());	
+				
+			//keep connection up until user decides to disconnect. Has to take in at least one message so do/while loop is better suited than while loop here.
+			do{
 				Object command = ins.readObject();
 				System.out.println(command);
 				
-				//server response to client
-				String message = "Client "+counter+", connected on socket "+sock;//response message to show bidirectional communication between client and server
-				ObjectOutputStream out = new ObjectOutputStream(sock.getOutputStream());
-				out.writeObject(message);
-				out.flush();
-				out.close();
+				switch((String)command){
+					case "Hello Server":
+						//server response to client
+						message = "Client "+Thread.currentThread().getName()+", connected on socket "+sock;//response message to show bidirectional communication between client and server
+						out = new ObjectOutputStream(sock.getOutputStream());
+						out.writeObject(message);
+						out.flush();
+						
+						break;
+					case "listFiles":
+						listFiles();	
+						break;
+					case "endConnection":
+						endConnection();
+						break;
+					default:
+						System.out.println("Unknown Command: "+command);
+						
+				}//end of switch(command)				
+				
+			}while(stayConnected);//end of while loop				
+				
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -83,7 +106,58 @@ public class WebServer {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			//close the connections at the end.
+				try {
+					sock.close();
+					out.close();
+					ins.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
 		}
-	}
+
+		//method to end connection
+		public void endConnection() throws IOException {
+			//server response to client
+			message = "Server disconnected. Good bye";
+			//out = new ObjectOutputStream(sock.getOutputStream());
+			out.writeObject(message);
+			out.flush();
+			System.out.println(Thread.activeCount());
+			
+			//change control variable to false to end loop
+			stayConnected = false;
+		}
+
+		//method to handle file listing
+		public void listFiles() throws IOException {
+			String response = "";
+			//code for reading files go here
+			File fileLocation = new File("./File_Source");// set up new file location of file folder at given path
+			File[] fileList = fileLocation.listFiles();//set up list of files in that folder
+			
+			//do a check to see if the folder is empty or not
+			if(fileList.length == 0){
+				System.out.println("File directory is empty!");// Message to display if file folder is empty.
+			}
+			else{
+				response = response+"Files currently in directory:\n";
+				//if folder is not empty then list of files in it is printed out
+				for(int i = 0; i<fileList.length; i++){
+					if(fileList[i].isFile()){
+						response = response+fileList[i].getName()+"\n";
+					}
+				}
+				System.out.println("\n");
+			}//end of if/else statement
+			//out = new ObjectOutputStream(sock.getOutputStream());
+			out.writeObject(response);
+			out.flush();
+			
+		}
+		
+	}//End of Request class
 
 }//End of WebServer class
