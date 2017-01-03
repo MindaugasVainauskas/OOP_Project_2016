@@ -171,20 +171,22 @@ public class WebServer {
 								
 				
 				File fileToSend = new File(filePath);//instantiate file at given location
-				out.writeLong(fileToSend.length());//send size of file first
-				out.flush();
 				
-				byte[] byteArray = new byte[(int)fileToSend.length()];//set up byte array to send file. It is same length as file size in bytes.
-				FileInputStream fins = new FileInputStream(fileToSend);//read in file from folder
-				BufferedInputStream bins = new BufferedInputStream(fins);//store file in temporary storage
-				bins.read(byteArray, 0, byteArray.length);//read file into temporary storage
-				
-				out.write(byteArray, 0, byteArray.length);//send file in output stream
-				out.flush();
-				bins.close();				
-				System.out.println("Transfer completed!");
-				out.writeInt(-1);
-				out.flush();
+				//check that file with given name exists and is a file, not a folder
+				if(fileToSend.exists() && fileToSend.isFile()){
+					out.writeLong(fileToSend.length());//send size of file first
+					out.flush();
+					
+					byte[] byteArray = new byte[(int)fileToSend.length()];//set up byte array to send file. It is same length as file size in bytes.
+					FileInputStream fins = new FileInputStream(fileToSend);//read in file from folder
+					BufferedInputStream bins = new BufferedInputStream(fins);//store file in temporary storage
+					bins.read(byteArray, 0, byteArray.length);//read file into temporary storage
+					
+					out.write(byteArray, 0, byteArray.length);//send file in output stream
+					out.flush();
+					bins.close();				
+					System.out.println("Transfer completed!");					
+				}//end if
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

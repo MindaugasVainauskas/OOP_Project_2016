@@ -142,10 +142,10 @@ public class Connection{
 	
 	//method to download a file. Method takes in download directory name and file name as parameters.
 	protected void DownloadFile(String directory, String fName){
-		String  FILE_PATH = directory+"/"+fName; //set the location for file to be downloaded to.
-		int buffer = 1024;//1KB file buffer size
-		int bytesRead;//int variable to receive incoming byte array 
-		int currentRead = 0;//variable to show how many bytes have been read already. Initialise it 0 as its empty at the moment.
+		String  FILE_PATH = directory+"/"+fName; //set the location for file to be downloaded to.		
+		int bytesRead = 0;//int variable to receive incoming byte array 
+		//int currentRead = 0;//variable to show how many bytes have been read already. Initialise it 0 as its empty at the moment.
+		//int buffer = 4096;//4KB buffer size
 		
 		String request = "downloadFile";
 		
@@ -171,22 +171,19 @@ public class Connection{
 			FileOutputStream fos = new FileOutputStream(FILE_PATH);
 		
 			BufferedOutputStream bos = new BufferedOutputStream(fos);
-			bytesRead = in.read(byteArray, 0, byteArray.length);
-			currentRead = bytesRead;
-			
+		
 			//while there is data to be read, keep reading input stream of bytes into bytes read variable.
-			do{
-				bytesRead = in.read(byteArray, currentRead, (byteArray.length-currentRead));
-				if(bytesRead >= 0){
-					currentRead += bytesRead;//update currently read byte amount with bytes read.
-					fileSize -= bytesRead;
-				}
-			}while(bytesRead > -1 && fileSize > 0);
+			while(bytesRead != -1 && fileSize > 0){
+				bytesRead = in.read(byteArray, 0, (int)Math.min(byteArray.length, fileSize));
+				
+				bos.write(byteArray, 0, bytesRead);//write the file into new location
+				bos.flush();//make sure bytes are written properly
+				fileSize -= bytesRead;
+				
+			}				
 			
-			bos.write(byteArray, 0, currentRead);//write the file into new location
-			bos.flush();//make sure all bytes written at new location.
 			bos.close();//close at the end			
-			fos.close();
+			fos.close();//close fileoutputstream
 			
 			System.out.println("File successfully downloaded");
 			
