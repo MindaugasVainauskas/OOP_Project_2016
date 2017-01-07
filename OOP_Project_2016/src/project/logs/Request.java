@@ -52,19 +52,19 @@ public class Request implements Serializable{
 	public class PoisonRequest extends Request{
 
 		public PoisonRequest(String command, String host, Date d) {
-			super(command, host, d);
-			// TODO Auto-generated constructor stub
+			super(command, host, d);			
 		}
 		
 	}
 	
 	//inner request logger class(will see if I can separate them later)
 	public class RequestLogger implements Runnable{
-		private BlockingQueue bq;
-		private boolean keepRunning = true;
-		private FileWriter fw;
 		
-		public RequestLogger(BlockingQueue q){
+		private BlockingQueue<Request> bq;
+		private volatile boolean keepRunning = true;
+		private FileWriter fw;
+
+		public RequestLogger(BlockingQueue<Request> q){
 			this.bq = q;
 			
 			try {
@@ -78,7 +78,7 @@ public class Request implements Serializable{
 			while(keepRunning){
 				Request r;
 				try {
-					r = q.take();
+					r = bq.take();
 					if(r instanceof PoisonRequest)
 						keepRunning = false;
 					

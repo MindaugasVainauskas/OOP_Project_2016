@@ -15,6 +15,7 @@ public class WebServer {
 	private static final String FILE_SOURCE = "./File_Source/";
 	//for above I used server number required in the project description
 	private int counter;
+	private Object lock = new Object();
 	
 	public WebServer(){
 		
@@ -42,8 +43,8 @@ public class WebServer {
 			while(keepRunning){
 				try {
 					Socket s = ss.accept();
-					new Thread(new Request(s), "Thread "+(counter+1)).start();//listener thread spawns new worker thread to do the job
-					counter++;
+					new Thread(new RequestHandler(s), "Thread "+(counter+1)).start();//listener thread spawns new worker thread to do the job
+					incrementCounter();
 					System.out.println("Connection count at "+counter);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -55,15 +56,16 @@ public class WebServer {
 	}// End of Listener class
 	
 	
-	private class Request implements Runnable{
-		private Socket sock;
-		private volatile boolean stayConnected = true;
-		private String message;
+	private class RequestHandler implements Runnable{
 		
-		private ObjectOutputStream out;
-		private ObjectInputStream ins;
+		private Socket sock; // socket name to be used
+		private volatile boolean stayConnected = true;//variable to manage threads and shut them down when finished.
+		private String message;//message to send to client
 		
-		private Request(Socket request){
+		private ObjectOutputStream out;//output to client
+		private ObjectInputStream ins;//input from client
+		
+		private RequestHandler(Socket request){
 			this.sock = request;
 		}
 		
@@ -71,13 +73,13 @@ public class WebServer {
 			try {
 				ins = new ObjectInputStream(sock.getInputStream());	
 				
-			//keep connection up until user decides to disconnect. Has to take in at least one message so do/while loop is better suited than while loop here.
-			do{
+			//keep connection up until user decides to disconnect.
+			while(stayConnected){
 				Object command = ins.readObject();
 				System.out.println(command);
 				
 				switch((String)command){
-					case "Hello Server":
+					case "Establish_Connection":
 						//server response to client
 						message = "Client "+Thread.currentThread().getName()+", connected on socket "+sock;//response message to show bidirectional communication between client and server
 						out = new ObjectOutputStream(sock.getOutputStream());
@@ -102,7 +104,7 @@ public class WebServer {
 						
 				}//end of switch(command)				
 				
-			}while(stayConnected);//end of while loop				
+			}//end of while loop				
 				
 				
 			} catch (IOException e) {
@@ -113,14 +115,14 @@ public class WebServer {
 				e.printStackTrace();
 			}
 			//close the connections at the end.
-				try {
-					sock.close();
-					out.close();
-					ins.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			try {
+				sock.close();
+				out.close();
+				ins.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 		}
 
@@ -134,6 +136,9 @@ public class WebServer {
 						
 			//change control variable to false to end loop
 			stayConnected = false;
+			decrementCounter();//reduce counter for active threads as this thread is closing.
+			System.out.println("Active client count at: "+counter);
+			
 		}
 
 		//method to handle file listing
@@ -190,11 +195,21 @@ public class WebServer {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
-			
-			
+			}			
 		}
 		
-	}//End of Request class
+	}//End of RequestHandler class
+	
+	//only allow one thread at a time access to changing counter amount. as such synchronization is needed.
+	private void incrementCounter(){
+		synchronized (lock){
+			counter++;
+		}
+	}
+	private void decrementCounter(){
+		synchronized (lock){
+			counter--;
+		}
+	}
 
 }//End of WebServer class

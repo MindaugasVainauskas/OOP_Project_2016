@@ -78,7 +78,7 @@ public class Connection{
 	protected void connectToServer(String hName, int hPort){			
 			try {
 				s = new Socket(hName, hPort);// set up socket connection with server at given hostname and port
-				String message = "Hello Server";	
+				String message = "Establish_Connection";	
 				out = new ObjectOutputStream(s.getOutputStream());
 				out.writeObject(message);
 				out.flush();// need to make sure that message has been sent
@@ -163,9 +163,9 @@ public class Connection{
 			
 			System.out.println("Path for downloaded file: "+FILE_PATH);
 			
-			
+			//read in file size that is sent by server.
 			long fileSize = in.readLong();
-			System.out.println(fileSize);
+			
 			//receive the file
 			byte [] byteArray = new byte[(int) fileSize];
 			FileOutputStream fos = new FileOutputStream(FILE_PATH);
@@ -185,7 +185,7 @@ public class Connection{
 			bos.close();//close at the end			
 			fos.close();//close fileoutputstream
 			
-			System.out.println("File successfully downloaded");
+			System.out.println("\nFile "+request2+" was successfully downloaded!\n");
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
