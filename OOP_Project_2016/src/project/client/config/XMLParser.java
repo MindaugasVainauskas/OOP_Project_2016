@@ -1,6 +1,8 @@
 //This is the class that will parse client configuration parameters
 package project.client.config;
 
+import java.io.FileInputStream;
+
 import javax.xml.parsers.*; // Import parsers to read xml files
 import org.w3c.dom.*; // Import DOM model to work with documents
 
@@ -16,7 +18,12 @@ public class XMLParser {
 	public void initialise() throws Throwable{
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
-		Document doc = db.parse(Context.CONF_FILE);
+		
+		Document doc;
+		//parse file input stream
+		try(FileInputStream input = new FileInputStream(ctx.getConfigFile())){
+			doc = db.parse(input);
+		}
 		
 		Element root = doc.getDocumentElement();
 		NodeList children = root.getChildNodes();

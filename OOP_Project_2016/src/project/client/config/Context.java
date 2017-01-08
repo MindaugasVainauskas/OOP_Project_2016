@@ -3,15 +3,19 @@ package project.client.config;
 
 public class Context {
 	
+	//Name of configuration xml file for parsing
+	private final String CONF_FILE = "conf.xml";
 	//variables needed 
-	public static final String CONF_FILE = "conf.xml";
-	
 	private String host;
 	private int port;
 	private String directory;
 	
 	public Context(){
 		super();
+	}
+	
+	public String getConfigFile(){
+		return CONF_FILE;
 	}
 
 	//getters and setters for host, port and download directory
