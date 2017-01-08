@@ -3,6 +3,7 @@ package project.server;
 //imports to handle IO and network requests
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 public class WebServer {
 	private ServerSocket ss;
@@ -36,6 +37,7 @@ public class WebServer {
 	
 	}
 	
+	//Inner Listener class that starts new worker threads as requests come in.
 	private class Listener implements Runnable{
 		public void run(){
 			counter = 0;
@@ -55,7 +57,7 @@ public class WebServer {
 		}
 	}// End of Listener class
 	
-	
+	//inner class to look after the actual requests from clients.
 	private class RequestHandler implements Runnable{
 		
 		private Socket sock; // socket name to be used
@@ -145,12 +147,13 @@ public class WebServer {
 		public void listFiles() throws IOException {
 			String response = "";
 			//code for reading files go here
-			File fileLocation = new File("./File_Source");// set up new file location of file folder at given path
+			File fileLocation = new File("./File_Source");// set up new file location of file folder at given path		
 			File[] fileList = fileLocation.listFiles();//set up list of files in that folder
 			
 			//do a check to see if the folder is empty or not
 			if(fileList.length == 0){
 				System.out.println("File directory is empty!");// Message to display if file folder is empty.
+				response = response+"Directory is empty!\n";
 			}
 			else{
 				response = response+"Files currently in directory:\n";
@@ -161,9 +164,14 @@ public class WebServer {
 					}
 				}
 				System.out.println("\n");
-			}//end of if/else statement			
+			}//end of if/else statement		
+					
+				
 			out.writeObject(response);
 			out.flush();
+			
+			
+			
 			
 		}
 		
